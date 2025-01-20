@@ -8,6 +8,21 @@ lib.callback.register('hajden_npcrobbery:server:canRobNPC', function(source, npc
     if recentlyRobbedNPCs[npcId] then
         return false
     end
+
+    local ent = NetworkGetEntityFromNetworkId(npcId)
+    if not DoesEntityExist(ent) then
+        return false
+    end
+
+    local pPed = GetPlayerPed(source)
+    local pCoords = GetEntityCoords(pPed)
+    local npcCoords = GetEntityCoords(ent)
+
+    -- distance check
+    if #(pCoords - npcCoords) > Config.interactDistance then
+        return false
+    end
+
     return true
 end)
 
@@ -21,18 +36,23 @@ lib.callback.register('hajden_npcrobbery:server:markNPCAsRobbed', function(npcId
     end)
 end)
 
----@type fun(targetNPC: number)
-RegisterNetEvent('hajden_npcrobbery:server:start', function(targetNPC)
+---@type fun(target: number)
+RegisterNetEvent('hajden_npcrobbery:server:start', function(target)
     local source = source
     local player = Ox.GetPlayer(source)
 
     if not player then return end
 
+    local entCheck = lib.callback.await("hajden_npcrobbery:client:entityCheck", source, target)
+    if not entCheck then
+        return
+    end
+
     robbingPlayers[source] = { 
-        target = targetNPC, 
+        target = target, 
         startTime = os.time()
     }
-    TriggerClientEvent('hajden_npcrobbery:client:start', source, targetNPC)
+    TriggerClientEvent('hajden_npcrobbery:client:start', source, target)
 end)
 
 RegisterNetEvent('hajden_npcrobbery:server:success', function()
@@ -45,7 +65,7 @@ RegisterNetEvent('hajden_npcrobbery:server:success', function()
     end
 
     local elapsedTime = os.time() - data.startTime
-    if elapsedTime <= Config.robberyTime-5 then
+    if elapsedTime <= Config.robberyTime - 5 then
         return
     end
 
