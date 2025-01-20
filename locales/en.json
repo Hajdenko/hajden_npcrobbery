@@ -1,0 +1,9 @@
+{
+    "robbery": "Robbery",
+    "rewardinfo": "You got $%s!",
+    "deadordying": "You cannot rob dead or dying people!",
+    "cooldown": "This person has already been robbed!",
+    "rob_action": "Start Robbery",
+    "runaway": "The person has ran away from you and called the cops!",
+    "robbing": "💰 Robbing Person..."
+}
