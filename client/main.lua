@@ -46,7 +46,6 @@ local function canRobEntity(npc)
     return true
 end
 
-print("cs")
 exports.ox_target:addGlobalPed({
     {
         name = 'robbery_ped',
@@ -63,11 +62,21 @@ exports.ox_target:addGlobalPed({
         ---@param d table info ohledne targetu (coords resource entity distance self...)
         onSelect = function(d)
             if d.distance <= Config.interactDistance then
-                TriggerServerEvent('hajden_npcrobbery:server:start', d.entity)
+                if not NetworkGetEntityIsNetworked(d.entity) then
+                    NetworkRegisterEntityAsNetworked(d.entity)
+                end
+
+                if canRobEntity(d.entity) then
+                    TriggerServerEvent('hajden_npcrobbery:server:start', d.entity)
+                end
             end
         end
     }
 })
+
+lib.callback.register('hajden_npcrobbery:client:entityCheck', function(ent)
+    return DoesEntityExist(ent) and NetworkGetEntityIsNetworked(ent)
+end)
 
 ---@type fun(target: number)
 ---@param target number npc co hrac okrada
