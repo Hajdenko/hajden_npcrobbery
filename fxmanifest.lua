@@ -4,7 +4,7 @@ lua54 'yes'
 
 author 'hajden'
 description 'npc robbery what else to say..'
-version '1.0.0'
+version '1.0.1'
 
 dependencies {
     'ox_lib',
